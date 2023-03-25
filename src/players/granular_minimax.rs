@@ -1,14 +1,14 @@
 use std::i32::{MIN, MAX};
 
-use rand::{seq::SliceRandom, thread_rng, Rng};
+use rand::{Rng};
 
 use crate::{player::Player, game::Game, game_move::{Move, MoveDescription, expect_attr_coord}, moves::{generate_moves, move_kill_pawn::{MoveKillPawn, generate, self}, move_displace_pawn::MoveDisplacePawn, move_place_pawn::MovePlacePawn, move_pass::MovePass, MoveType}, utils};
 
-pub struct Minimax {
+pub struct GranularMinimax {
     pub plid: usize
 }
 
-impl Player for Minimax {
+impl Player for GranularMinimax {
     fn play(&mut self, game: &Game) -> usize {
         let moves = generate_moves(game);
         let descriptions: Vec<MoveDescription> = moves.iter().map(|m| m.describe(game)).collect();
@@ -32,7 +32,7 @@ impl Player for Minimax {
     }
 }
 
-impl Minimax {
+impl GranularMinimax {
     fn score(&self, game: &Game) -> i32 {
         let opp_plid = (game.playing_plid + 1) % game.params.players;
         let advancement = utils::dead_pawns_count(game, opp_plid) * 10;

@@ -7,3 +7,4 @@ pub mod moves;
 pub mod pawn;
 pub mod coord;
 pub mod tile;
+pub mod utils;
