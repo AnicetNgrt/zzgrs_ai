@@ -1,6 +1,13 @@
 use std::collections::HashMap;
 
-use crate::{params::Params, game_move::Move, pawn::{Pawn, StagedPawn}, coord::Coord, tile::{Tile, OccupiedTile, EmptyTile}, utils};
+use crate::{
+    coord::Coord,
+    game_move::Move,
+    params::Params,
+    pawn::{Pawn, StagedPawn},
+    tile::{EmptyTile, Tile},
+    utils,
+};
 
 #[derive(Clone)]
 pub struct Game {
@@ -9,14 +16,14 @@ pub struct Game {
     pub playing_plid: usize,
     pub pawns: Vec<Vec<Pawn>>,
     pub tiles: HashMap<Coord, Tile>,
-    pub apts: Vec<u8>
+    pub apts: Vec<u8>,
 }
 
 impl Game {
     pub fn new(params: Params) -> Self {
         let pawns = Self::initial_pawns(&params);
         let apts = vec![0; params.players];
-        
+
         Self {
             params,
             turn: 0,
@@ -88,11 +95,11 @@ impl Game {
         self.turn > self.params.turns
     }
 
-    pub fn apply_move(&mut self, m: &mut Box<dyn Move>) {
+    pub fn apply_move(&mut self, m: &mut Move) {
         m.apply(self);
     }
 
-    pub fn rollback_move(&mut self, m: &mut Box<dyn Move>) {
+    pub fn rollback_move(&mut self, m: &mut Move) {
         m.rollback(self);
     }
 }

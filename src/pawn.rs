@@ -4,12 +4,12 @@ use crate::coord::Coord;
 pub enum Pawn {
     PlacedPawn(PlacedPawn),
     StagedPawn(StagedPawn),
-    DeadPawn(DeadPawn)
+    DeadPawn(DeadPawn),
 }
 
 #[derive(Clone, Debug)]
 pub struct PlacedPawn {
-    pub coord: Coord
+    pub coord: Coord,
 }
 
 #[derive(Clone, Debug)]

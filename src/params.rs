@@ -5,5 +5,5 @@ pub struct Params {
     pub pawns: usize,
     pub width: i8,
     pub height: i8,
-    pub apts: u8
+    pub apts: u8,
 }

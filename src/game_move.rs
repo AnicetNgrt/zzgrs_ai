@@ -1,62 +1,61 @@
-use crate::{game::Game, coord::Coord, tile::Tile, pawn::Pawn, moves::{MoveType}};
+use crate::{
+    game::Game,
+    moves::{
+        move_displace_pawn::MoveDisplacePawn, move_kill_pawn::MoveKillPawn, move_pass::MovePass,
+        move_place_pawn::MovePlacePawn,
+    },
+};
+use crate::moves::MoveType;
 
-#[derive(Debug)]
-pub struct MoveDescription(pub MoveType, pub Vec<MoveAttribute>);
+macro_rules! Move {
+    ([$($move_type:ident),*]) => {
+        #[derive(Debug)]
+        pub enum Move {
+            $(
+                $move_type($move_type),
+            )*
+        }
 
-#[derive(Clone, Debug)]
-pub struct MoveAttribute {
-    pub name: String,
-    pub value: MoveAttributeValue
-}
+        impl Move {
+            pub fn apply(&mut self, game: &mut Game) {
+                match self {
+                    $(
+                        Move::$move_type(m) => m.apply(game),
+                    )*
+                }
+            }
 
-#[derive(Clone, Debug)]
-pub enum MoveAttributeValue {
-    Plid(usize),
-    Pawn(usize, usize, Pawn),
-    Coord(Coord, Tile),
-}
+            pub fn rollback(&mut self, game: &mut Game) {
+                match self {
+                    $(
+                        Move::$move_type(m) => m.rollback(game),
+                    )*
+                }
+            }
 
-pub trait Move {
-    fn apply(&mut self, game: &mut Game);
-    fn rollback(&mut self, game: &mut Game);
-    fn describe(&self, game: &Game) -> MoveDescription;
-}
+            pub fn regenerate(&self) -> Self {
+                match self {
+                    $(
+                        Move::$move_type(m) => Move::$move_type(m.regenerate()),
+                    )*
+                }
+            }
 
-pub fn expect_attr_plid<'a>(name: &str, attrs: &'a Vec<MoveAttribute>) -> &'a usize {
-    for attr in attrs.iter() {
-        if attr.name == name {
-            let value = &attr.value;
-            match value {
-                MoveAttributeValue::Plid(plid) => return &plid,
-                _ => {}
+            pub fn generate_all(game: &Game) -> Vec<Self> {
+                let mut moves: Vec<Move> = vec![];
+
+                $(
+                moves.append(&mut $move_type::generate(game, game.playing_plid));
+                )*
+
+                moves
             }
         }
     };
-    panic!()
 }
 
-pub fn expect_attr_pawn<'a>(name: &str, attrs: &'a Vec<MoveAttribute>) -> (&'a usize, &'a usize, &'a Pawn) {
-    for attr in attrs.iter() {
-        if attr.name == name {
-            let value = &attr.value;
-            match value {
-                MoveAttributeValue::Pawn(plid, pwid, pawn) => return (&plid, &pwid, &pawn),
-                _ => {}
-            }
-        }
-    };
-    panic!()
-}
+Move!([MoveKillPawn, MoveDisplacePawn, MovePlacePawn, MovePass]);
 
-pub fn expect_attr_coord<'a>(name: &str, attrs: &'a Vec<MoveAttribute>) -> (&'a Coord, &'a Tile) {
-    for attr in attrs.iter() {
-        if attr.name == name {
-            let value = &attr.value;
-            match value {
-                MoveAttributeValue::Coord(coord, tile) => return (&coord, &tile),
-                _ => {}
-            }
-        }
-    };
-    panic!()
+pub fn regenerate_all(moves: &Vec<Move>) -> Vec<Move> {
+    moves.iter().map(|m| m.regenerate()).collect()
 }

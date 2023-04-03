@@ -1,15 +1,21 @@
-use crate::{game_move::{Move, MoveAttribute, MoveDescription}, game::Game};
+use crate::{game::Game, game_move::Move};
 
 use super::MoveType;
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub struct MovePass {
     previous_plid: Option<usize>,
     previous_turn: Option<usize>,
-    previous_apts: Option<u8>
+    previous_apts: Option<u8>,
 }
 
-impl Move for MovePass {
+impl MovePass {
+    pub fn generate(_game: &Game, _plid: usize) -> Vec<Move> {
+        return vec![Move::MovePass(MovePass::default())];
+    }
+}
+
+impl MoveType for MovePass {
     fn apply(&mut self, game: &mut crate::game::Game) {
         self.previous_turn = Some(game.turn);
         game.turn += 1;
@@ -25,11 +31,7 @@ impl Move for MovePass {
         game.turn = self.previous_turn.expect("");
     }
 
-    fn describe(&self, game: &Game) -> MoveDescription {
-        MoveDescription(MoveType::MovePass, Vec::<MoveAttribute>::new())
+    fn regenerate(&self) -> Self {
+        Self::default()
     }
-}
-
-pub fn generate(_game: &Game, plid: usize) -> Vec<MovePass> {
-    return vec![MovePass::default()]
 }

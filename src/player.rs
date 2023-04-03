@@ -1,5 +1,5 @@
-use crate::{game::Game};
+use crate::game::Game;
 
-pub trait Player {    
+pub trait Player {
     fn play(&mut self, game: &Game) -> usize;
 }
